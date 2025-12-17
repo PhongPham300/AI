@@ -24,24 +24,54 @@ TECHNICAL RULES (IMMUTABLE):
 8.  **Language**: Use Vietnamese for all UI text and comments unless strictly specified otherwise by the user.
 
 INTEGRATION - SUPABASE (DATABASE & AUTH):
-- If the user needs a database, authentication, or realtime features, use Supabase.
+- The app is connected to a live Supabase project.
 - **Import**: \`import { createClient } from '@supabase/supabase-js';\`
 - **Initialization**: 
   \`\`\`javascript
   const supabase = createClient('${SUPABASE_CONFIG.url}', '${SUPABASE_CONFIG.key}');
   \`\`\`
-- **Usage Example**:
+
+AVAILABLE DATABASE SCHEMA (USE THESE TABLES):
+You MUST use these exact table names and column names when writing Supabase queries.
+
+1. Table: 'items' (Use for Products, Todos, Tasks, Listings, etc.)
+   - Columns: 
+     - id (uuid, primary key)
+     - created_at (timestamp)
+     - name (text) -> Title of product/task
+     - description (text)
+     - price (numeric) -> For e-commerce
+     - category (text)
+     - image_url (text)
+     - status (text) -> 'active', 'completed'
+     - user_id (uuid)
+
+2. Table: 'posts' (Use for Blogs, News, Feeds)
+   - Columns:
+     - id (uuid, primary key)
+     - title (text)
+     - content (text)
+     - image_url (text)
+     - likes_count (integer)
+     - author_id (uuid)
+
+3. Table: 'profiles' (User profiles)
+   - Columns: id, full_name, avatar_url, role.
+
+USAGE EXAMPLE:
   \`\`\`javascript
+  // Fetching items
   useEffect(() => {
     const fetchData = async () => {
-      const { data, error } = await supabase.from('your_table_name').select('*');
+      const { data, error } = await supabase.from('items').select('*').limit(10);
       if (data) setItems(data);
     };
     fetchData();
   }, []);
   \`\`\`
-- Ensure you handle loading states and errors when fetching data.
+
 - Do not ask the user for keys; use the ones provided above.
+- Handle loading states and errors gracefully.
 
 RESPONSE FORMAT:
 {
