@@ -28,6 +28,8 @@ const PreviewFrame: React.FC<PreviewFrameProps> = ({ code, refreshTrigger }) => 
         <!-- Lucide Icons -->
         <script src="https://unpkg.com/lucide@latest"></script>
         <script src="https://unpkg.com/lucide-react/dist/lucide-react.min.js"></script>
+        <!-- Supabase Client -->
+        <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
         <!-- Recharts (Optional support) -->
         <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
         
@@ -42,10 +44,12 @@ const PreviewFrame: React.FC<PreviewFrameProps> = ({ code, refreshTrigger }) => 
           const { useState, useEffect, useRef, useMemo, useCallback } = React;
           
           // Shim for imports since we are in a simple script tag environment
-          // We define a simple 'require' or just map window globals to expected import names
           
           // Mocking lucide-react icons availability
           const LucideIcons = window.lucide ? window.lucide.icons : {};
+          
+          // Shim Supabase createClient
+          const { createClient } = window.supabase || {};
           
           // We wrap the user code in a function to avoid global scope pollution issues, 
           // but we need to handle the 'export default' or 'export' syntax which Babel standalone doesn't love in scripts.

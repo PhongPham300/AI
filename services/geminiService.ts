@@ -3,6 +3,12 @@ import { GeneratedCode, ModelConfig, Attachment } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+// Supabase Configuration from user
+const SUPABASE_CONFIG = {
+  url: "https://hxttqirdvgfwjfxljcjf.supabase.co",
+  key: "sb_publishable_Mvfoz5cLpfzKxeEei8AMBQ_kiiyIB6A"
+};
+
 const CORE_SYSTEM_INSTRUCTION = `
 You are an expert Senior React Frontend Engineer and UI/UX Designer.
 Your task is to generate complete, production-ready React components.
@@ -16,6 +22,26 @@ TECHNICAL RULES (IMMUTABLE):
 6.  **File**: Single file, export default component.
 7.  **No Markdown**: Return raw JSON.
 8.  **Language**: Use Vietnamese for all UI text and comments unless strictly specified otherwise by the user.
+
+INTEGRATION - SUPABASE (DATABASE & AUTH):
+- If the user needs a database, authentication, or realtime features, use Supabase.
+- **Import**: \`import { createClient } from '@supabase/supabase-js';\`
+- **Initialization**: 
+  \`\`\`javascript
+  const supabase = createClient('${SUPABASE_CONFIG.url}', '${SUPABASE_CONFIG.key}');
+  \`\`\`
+- **Usage Example**:
+  \`\`\`javascript
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase.from('your_table_name').select('*');
+      if (data) setItems(data);
+    };
+    fetchData();
+  }, []);
+  \`\`\`
+- Ensure you handle loading states and errors when fetching data.
+- Do not ask the user for keys; use the ones provided above.
 
 RESPONSE FORMAT:
 {
