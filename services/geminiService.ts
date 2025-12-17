@@ -15,6 +15,7 @@ TECHNICAL RULES (IMMUTABLE):
 5.  **Output**: Valid JSON object.
 6.  **File**: Single file, export default component.
 7.  **No Markdown**: Return raw JSON.
+8.  **Language**: Use Vietnamese for all UI text and comments unless strictly specified otherwise by the user.
 
 RESPONSE FORMAT:
 {
@@ -69,11 +70,11 @@ export const generateAppCode = async (
     const parsed = JSON.parse(responseText);
     return {
       code: parsed.code,
-      explanation: parsed.explanation || "App generated successfully."
+      explanation: parsed.explanation || "Đã tạo ứng dụng thành công."
     };
 
   } catch (error) {
     console.error("Gemini API Error:", error);
-    throw new Error("Failed to generate code. Please try again.");
+    throw new Error("Không thể tạo mã nguồn. Vui lòng thử lại.");
   }
 };

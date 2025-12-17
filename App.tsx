@@ -28,25 +28,25 @@ export default function App() {
             GenWeb Studio
           </h1>
           <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto leading-relaxed">
-            The professional AI workspace for instant web generation. 
-            Describe it, tune the model, and watch it build.
+            Không gian làm việc AI chuyên nghiệp để tạo web tức thì. 
+            Mô tả ý tưởng, tùy chỉnh mô hình và xem kết quả ngay.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
             <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
               <Zap className="text-yellow-400 mb-2" size={20} />
-              <h3 className="font-semibold text-sm mb-1">Instant Preview</h3>
-              <p className="text-xs text-slate-500">Live rendering with React & Tailwind</p>
+              <h3 className="font-semibold text-sm mb-1">Xem trước tức thì</h3>
+              <p className="text-xs text-slate-500">Hiển thị trực tiếp với React & Tailwind</p>
             </div>
             <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
               <Settings2 className="text-blue-400 mb-2" size={20} />
-              <h3 className="font-semibold text-sm mb-1">Full Control</h3>
-              <p className="text-xs text-slate-500">Tune Temperature & System Prompts</p>
+              <h3 className="font-semibold text-sm mb-1">Kiểm soát đầy đủ</h3>
+              <p className="text-xs text-slate-500">Điều chỉnh Nhiệt độ & Prompt</p>
             </div>
             <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
               <Code2 className="text-purple-400 mb-2" size={20} />
-              <h3 className="font-semibold text-sm mb-1">Clean Code</h3>
-              <p className="text-xs text-slate-500">Production-ready React 18</p>
+              <h3 className="font-semibold text-sm mb-1">Mã nguồn sạch</h3>
+              <p className="text-xs text-slate-500">React 18 sẵn sàng cho sản phẩm</p>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@ const App: React.FC = () => {
     } catch (error) {
       const errorMsg: ChatMessage = { 
         role: 'model', 
-        content: "System Error: Failed to generate code. Please check your API usage or try again.", 
+        content: "Lỗi Hệ Thống: Không thể tạo mã nguồn. Vui lòng kiểm tra API key hoặc thử lại.", 
         timestamp: Date.now() 
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -115,7 +115,7 @@ const App: React.FC = () => {
             <Layout size={16} className="text-white" />
           </div>
           <span className="font-bold text-sm tracking-wide text-gray-200">GenWeb <span className="text-blue-500">Studio</span></span>
-          <span className="text-xs text-gray-600 border border-gray-800 rounded px-1.5 py-0.5">Beta</span>
+          <span className="text-xs text-gray-600 border border-gray-800 rounded px-1.5 py-0.5">Thử nghiệm</span>
         </div>
         
         <div className="flex items-center gap-4">
@@ -124,26 +124,26 @@ const App: React.FC = () => {
               onClick={() => setViewMode(ViewMode.CODE)}
               className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all ${viewMode === ViewMode.CODE ? 'bg-[#2a2a2a] text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
             >
-              <Code size={12} /> Code
+              <Code size={12} /> Mã nguồn
             </button>
             <button 
               onClick={() => setViewMode(ViewMode.SPLIT)}
               className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all hidden md:flex ${viewMode === ViewMode.SPLIT ? 'bg-[#2a2a2a] text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
             >
-              <Layout size={12} /> Split
+              <Layout size={12} /> Chia đôi
             </button>
             <button 
               onClick={() => setViewMode(ViewMode.PREVIEW)}
               className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all ${viewMode === ViewMode.PREVIEW ? 'bg-[#2a2a2a] text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
             >
-              <Play size={12} /> Preview
+              <Play size={12} /> Xem trước
             </button>
           </div>
           
           <button 
             onClick={() => setShowSettings(!showSettings)}
             className={`p-1.5 rounded-md transition-colors ${showSettings ? 'text-blue-400 bg-blue-400/10' : 'text-gray-500 hover:text-white'}`}
-            title="Toggle Settings"
+            title="Cài đặt"
           >
             <Settings2 size={18} />
           </button>
@@ -175,20 +175,20 @@ const App: React.FC = () => {
              <div className="h-9 border-b border-gray-800 bg-[#09090b] flex items-center justify-between px-4">
                 <div className="flex items-center gap-2">
                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                   <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Live Environment</span>
+                   <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Môi trường trực tiếp</span>
                 </div>
                 <div className="flex gap-1">
                    <button 
                     onClick={() => setDevicePreview('desktop')}
                     className={`p-1.5 hover:bg-gray-800 rounded transition-colors ${devicePreview === 'desktop' ? 'text-blue-400' : 'text-gray-600'}`}
-                    title="Desktop View"
+                    title="Giao diện máy tính"
                    >
                      <Monitor size={14} />
                    </button>
                    <button 
                     onClick={() => setDevicePreview('mobile')}
                     className={`p-1.5 hover:bg-gray-800 rounded transition-colors ${devicePreview === 'mobile' ? 'text-blue-400' : 'text-gray-600'}`}
-                    title="Mobile View"
+                    title="Giao diện điện thoại"
                    >
                      <Smartphone size={14} />
                    </button>

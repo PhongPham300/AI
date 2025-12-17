@@ -19,7 +19,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ code }) => {
           className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
         >
           <Copy size={12} />
-          Copy
+          Sao chép
         </button>
       </div>
       <div className="flex-1 overflow-auto p-4">

@@ -63,7 +63,7 @@ const PreviewFrame: React.FC<PreviewFrameProps> = ({ code, refreshTrigger }) => 
           if (typeof App !== 'undefined') {
              root.render(<App />);
           } else {
-             rootElement.innerHTML = '<div class="p-4 text-red-500">Error: Could not find component "App". Please ensure the code defines "const App" or "export default function App".</div>';
+             rootElement.innerHTML = '<div class="p-4 text-red-500">Lỗi: Không tìm thấy component "App". Vui lòng đảm bảo mã nguồn định nghĩa "const App" hoặc "export default function App".</div>';
           }
         </script>
       </body>

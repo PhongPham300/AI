@@ -61,7 +61,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 opacity-60">
-            <p className="text-sm">Start by describing your app or attaching a design.</p>
+            <p className="text-sm">Bắt đầu bằng cách mô tả ứng dụng của bạn hoặc đính kèm thiết kế.</p>
           </div>
         )}
         
@@ -106,7 +106,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
               </div>
               <div className="text-gray-400 text-sm flex items-center gap-2 py-2">
                 <Loader2 size={14} className="animate-spin text-blue-400" />
-                <span>{status.step === 'thinking' ? 'Analyzing requirements...' : 'Writing code...'}</span>
+                <span>{status.step === 'thinking' ? 'Đang phân tích yêu cầu...' : 'Đang viết mã...'}</span>
               </div>
            </div>
         )}
@@ -145,7 +145,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                 handleSubmit(e);
               }
             }}
-            placeholder="Describe your app or ask for changes..."
+            placeholder="Mô tả ứng dụng của bạn hoặc yêu cầu thay đổi..."
             className="w-full bg-transparent text-white placeholder-gray-500 text-sm p-3 max-h-32 min-h-[50px] focus:outline-none resize-none"
             rows={1}
             disabled={status.isGenerating}
@@ -155,7 +155,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                type="button"
                onClick={() => fileInputRef.current?.click()}
                className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700 transition-colors"
-               title="Attach Image"
+               title="Đính kèm ảnh"
              >
                <ImageIcon size={18} />
              </button>
