@@ -1,54 +1,28 @@
 import React, { useState, useCallback } from 'react';
-import { Layout, Code, Play, Smartphone, Monitor, Settings2 } from 'lucide-react';
+import { Layout, Code, Play, Smartphone, Monitor } from 'lucide-react';
 import ChatInterface from './components/ChatInterface';
 import PreviewFrame from './components/PreviewFrame';
 import CodeEditor from './components/CodeEditor';
-import SettingsPanel, { DEFAULT_CONFIG } from './components/SettingsPanel';
 import { generateAppCode } from './services/geminiService';
-import { ChatMessage, GenerationStatus, ViewMode, ModelConfig, Attachment } from './types';
+import { ChatMessage, GenerationStatus, ViewMode } from './types';
 
 // Initial placeholder code
 const INITIAL_CODE = `import React from 'react';
-import { Sparkles, Zap, Code2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-center p-4">
-      <div className="relative max-w-2xl w-full">
-        {/* Glow Effect */}
-        <div className="absolute -top-20 -left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-
-        <div className="relative bg-[#1e293b]/80 backdrop-blur-xl p-10 rounded-3xl border border-slate-700 shadow-2xl text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mb-8 shadow-lg">
-            <Sparkles size={40} className="text-white" />
-          </div>
-          
-          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-            GenWeb Studio
-          </h1>
-          <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto leading-relaxed">
-            Không gian làm việc AI chuyên nghiệp để tạo web tức thì. 
-            Mô tả ý tưởng, tùy chỉnh mô hình và xem kết quả ngay.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-            <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
-              <Zap className="text-yellow-400 mb-2" size={20} />
-              <h3 className="font-semibold text-sm mb-1">Xem trước tức thì</h3>
-              <p className="text-xs text-slate-500">Hiển thị trực tiếp với React & Tailwind</p>
-            </div>
-            <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
-              <Settings2 className="text-blue-400 mb-2" size={20} />
-              <h3 className="font-semibold text-sm mb-1">Kiểm soát đầy đủ</h3>
-              <p className="text-xs text-slate-500">Điều chỉnh Nhiệt độ & Prompt</p>
-            </div>
-            <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
-              <Code2 className="text-purple-400 mb-2" size={20} />
-              <h3 className="font-semibold text-sm mb-1">Mã nguồn sạch</h3>
-              <p className="text-xs text-slate-500">React 18 sẵn sàng cho sản phẩm</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-center p-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-slate-100">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Sparkles size={32} />
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Ready to Build</h1>
+        <p className="text-slate-600 mb-6">
+          Describe what you want to create in the chat on the left.
+        </p>
+        <div className="text-xs text-slate-400 bg-slate-50 p-3 rounded-lg border border-slate-100">
+          Try: "A login page for a travel app" or "Một trang dashboard quản lý bán hàng"
         </div>
       </div>
     </div>
@@ -62,27 +36,20 @@ const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.SPLIT);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [devicePreview, setDevicePreview] = useState<'desktop' | 'mobile'>('desktop');
-  const [modelConfig, setModelConfig] = useState<ModelConfig>(DEFAULT_CONFIG);
-  const [showSettings, setShowSettings] = useState(true);
 
-  const handleSendMessage = useCallback(async (content: string, attachments: Attachment[]) => {
-    const newUserMsg: ChatMessage = { role: 'user', content, timestamp: Date.now(), attachments };
+  const handleSendMessage = useCallback(async (content: string) => {
+    const newUserMsg: ChatMessage = { role: 'user', content, timestamp: Date.now() };
     setMessages(prev => [...prev, newUserMsg]);
     
     setStatus({ isGenerating: true, step: 'thinking' });
 
     try {
-      // Simulate "Thinking" delay for UX
+      // Small delay to show "thinking" state
       await new Promise(r => setTimeout(r, 600));
       setStatus({ isGenerating: true, step: 'coding' });
 
-      // Call Gemini API with Config
-      const result = await generateAppCode(
-        content, 
-        modelConfig, 
-        attachments,
-        currentCode !== INITIAL_CODE ? currentCode : undefined
-      );
+      // Call Gemini API
+      const result = await generateAppCode(content, currentCode !== INITIAL_CODE ? currentCode : undefined);
       
       setCurrentCode(result.code);
       setRefreshTrigger(prev => prev + 1); // Force preview reload
@@ -97,98 +64,81 @@ const App: React.FC = () => {
     } catch (error) {
       const errorMsg: ChatMessage = { 
         role: 'model', 
-        content: "Lỗi Hệ Thống: Không thể tạo mã nguồn. Vui lòng kiểm tra API key hoặc thử lại.", 
+        content: "Sorry, I encountered an error while generating the code. Please try again.", 
         timestamp: Date.now() 
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setStatus({ isGenerating: false });
     }
-  }, [currentCode, modelConfig]);
+  }, [currentCode]);
 
   return (
-    <div className="h-screen w-full flex flex-col bg-black text-white overflow-hidden font-sans selection:bg-blue-500/30">
-      {/* Studio Header */}
-      <header className="h-12 border-b border-gray-800 flex items-center justify-between px-4 bg-[#111] flex-shrink-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-gradient-to-tr from-blue-600 to-purple-600 rounded flex items-center justify-center">
-            <Layout size={16} className="text-white" />
+    <div className="h-screen w-full flex flex-col bg-gray-950 text-white overflow-hidden font-sans">
+      {/* Header */}
+      <header className="h-14 border-b border-gray-800 flex items-center justify-between px-4 bg-gray-900 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <Layout size={18} className="text-white" />
           </div>
-          <span className="font-bold text-sm tracking-wide text-gray-200">GenWeb <span className="text-blue-500">Studio</span></span>
-          <span className="text-xs text-gray-600 border border-gray-800 rounded px-1.5 py-0.5">Thử nghiệm</span>
+          <h1 className="font-bold text-lg tracking-tight">GenWeb <span className="text-blue-400 font-normal">AI</span></h1>
         </div>
         
-        <div className="flex items-center gap-4">
-          <div className="flex items-center bg-[#1a1a1a] rounded-lg p-0.5 border border-gray-800">
-            <button 
-              onClick={() => setViewMode(ViewMode.CODE)}
-              className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all ${viewMode === ViewMode.CODE ? 'bg-[#2a2a2a] text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              <Code size={12} /> Mã nguồn
-            </button>
-            <button 
-              onClick={() => setViewMode(ViewMode.SPLIT)}
-              className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all hidden md:flex ${viewMode === ViewMode.SPLIT ? 'bg-[#2a2a2a] text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              <Layout size={12} /> Chia đôi
-            </button>
-            <button 
-              onClick={() => setViewMode(ViewMode.PREVIEW)}
-              className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all ${viewMode === ViewMode.PREVIEW ? 'bg-[#2a2a2a] text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              <Play size={12} /> Xem trước
-            </button>
-          </div>
-          
+        <div className="flex items-center bg-gray-800 rounded-lg p-1 border border-gray-700">
           <button 
-            onClick={() => setShowSettings(!showSettings)}
-            className={`p-1.5 rounded-md transition-colors ${showSettings ? 'text-blue-400 bg-blue-400/10' : 'text-gray-500 hover:text-white'}`}
-            title="Cài đặt"
+            onClick={() => setViewMode(ViewMode.CODE)}
+            className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${viewMode === ViewMode.CODE ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'}`}
           >
-            <Settings2 size={18} />
+            <Code size={14} /> Code
+          </button>
+          <button 
+            onClick={() => setViewMode(ViewMode.SPLIT)}
+            className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all hidden md:flex ${viewMode === ViewMode.SPLIT ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'}`}
+          >
+            <Layout size={14} /> Split
+          </button>
+          <button 
+            onClick={() => setViewMode(ViewMode.PREVIEW)}
+            className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${viewMode === ViewMode.PREVIEW ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'}`}
+          >
+            <Play size={14} /> Preview
           </button>
         </div>
+
+        <div className="w-8"></div> {/* Spacer for balance */}
       </header>
 
-      {/* Main Workspace */}
+      {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* Panel 1: Settings (Collapsible) */}
-        {showSettings && (
-          <SettingsPanel config={modelConfig} setConfig={setModelConfig} />
-        )}
-
-        {/* Panel 2: Chat Interaction */}
-        <div className="w-[380px] flex-shrink-0 flex flex-col border-r border-gray-800 z-10 bg-[#131313]">
-           <ChatInterface 
+        {/* Left Panel: Chat */}
+        <div className="w-full md:w-[350px] lg:w-[400px] flex-shrink-0 border-r border-gray-800 z-10 flex flex-col">
+          <ChatInterface 
             messages={messages} 
             onSendMessage={handleSendMessage}
             status={status}
           />
         </div>
 
-        {/* Panel 3: Editor/Preview Stage */}
-        <div className="flex-1 bg-[#09090b] relative flex flex-col min-w-0">
+        {/* Right Panel: Workspace */}
+        <div className="flex-1 bg-gray-900 relative flex flex-col min-w-0">
           
-          {/* Stage Toolbar */}
+          {/* Toolbar for Preview */}
           {(viewMode === ViewMode.PREVIEW || viewMode === ViewMode.SPLIT) && (
-             <div className="h-9 border-b border-gray-800 bg-[#09090b] flex items-center justify-between px-4">
-                <div className="flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                   <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Môi trường trực tiếp</span>
-                </div>
-                <div className="flex gap-1">
+             <div className="h-10 border-b border-gray-800 bg-gray-900 flex items-center justify-between px-4">
+                <span className="text-xs text-gray-500 font-mono">Live Preview Environment</span>
+                <div className="flex gap-2">
                    <button 
                     onClick={() => setDevicePreview('desktop')}
-                    className={`p-1.5 hover:bg-gray-800 rounded transition-colors ${devicePreview === 'desktop' ? 'text-blue-400' : 'text-gray-600'}`}
-                    title="Giao diện máy tính"
+                    className={`p-1 hover:bg-gray-800 rounded ${devicePreview === 'desktop' ? 'text-blue-400' : 'text-gray-500'}`}
+                    title="Desktop View"
                    >
                      <Monitor size={14} />
                    </button>
                    <button 
                     onClick={() => setDevicePreview('mobile')}
-                    className={`p-1.5 hover:bg-gray-800 rounded transition-colors ${devicePreview === 'mobile' ? 'text-blue-400' : 'text-gray-600'}`}
-                    title="Giao diện điện thoại"
+                    className={`p-1 hover:bg-gray-800 rounded ${devicePreview === 'mobile' ? 'text-blue-400' : 'text-gray-500'}`}
+                    title="Mobile View"
                    >
                      <Smartphone size={14} />
                    </button>
@@ -198,24 +148,21 @@ const App: React.FC = () => {
 
           <div className="flex-1 flex overflow-hidden p-0 relative">
             
-            {/* Code Editor Area */}
+            {/* Code View */}
             {(viewMode === ViewMode.CODE || viewMode === ViewMode.SPLIT) && (
-              <div className={`h-full ${viewMode === ViewMode.SPLIT ? 'w-1/2 border-r border-gray-800' : 'w-full'} p-0`}>
+              <div className={`h-full ${viewMode === ViewMode.SPLIT ? 'w-1/2 border-r border-gray-800' : 'w-full'} p-2`}>
                 <CodeEditor code={currentCode} />
               </div>
             )}
 
-            {/* Preview Area */}
+            {/* Preview View */}
             {(viewMode === ViewMode.PREVIEW || viewMode === ViewMode.SPLIT) && (
-              <div className={`h-full flex items-center justify-center bg-black/50 ${viewMode === ViewMode.SPLIT ? 'w-1/2' : 'w-full'} p-6 relative`}>
-                 {/* Grid Background */}
-                 <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-                 
+              <div className={`h-full flex items-center justify-center bg-[#0d1117] ${viewMode === ViewMode.SPLIT ? 'w-1/2' : 'w-full'} p-4`}>
                 <div 
-                  className={`relative z-10 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] ${
+                  className={`transition-all duration-300 ease-in-out shadow-2xl ${
                     devicePreview === 'mobile' 
-                      ? 'w-[375px] h-[812px] rounded-[36px] border-[10px] border-[#222] bg-[#111] overflow-hidden ring-1 ring-white/10' 
-                      : 'w-full h-full rounded-lg border border-gray-800 bg-white'
+                      ? 'w-[375px] h-[812px] rounded-[30px] border-8 border-gray-800 overflow-hidden' 
+                      : 'w-full h-full rounded-md'
                   }`}
                 >
                   <PreviewFrame code={currentCode} refreshTrigger={refreshTrigger} />

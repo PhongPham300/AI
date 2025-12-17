@@ -1,18 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User as UserIcon, Loader2, Image as ImageIcon, X } from 'lucide-react';
-import { ChatMessage, GenerationStatus, Attachment } from '../types';
+import { Send, Bot, User as UserIcon, Loader2, Sparkles } from 'lucide-react';
+import { ChatMessage, GenerationStatus } from '../types';
 
 interface ChatInterfaceProps {
   messages: ChatMessage[];
-  onSendMessage: (message: string, attachments: Attachment[]) => void;
+  onSendMessage: (message: string) => void;
   status: GenerationStatus;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, status }) => {
   const [input, setInput] = useState('');
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -22,91 +20,62 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
     scrollToBottom();
   }, [messages, status]);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          const base64String = (event.target.result as string).split(',')[1];
-          setAttachments(prev => [...prev, {
-            mimeType: file.type,
-            data: base64String
-          }]);
-        }
-      };
-      
-      reader.readAsDataURL(file);
-    }
-    // Reset input
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!input.trim() && attachments.length === 0) || status.isGenerating) return;
-    onSendMessage(input, attachments);
+    if (!input.trim() || status.isGenerating) return;
+    onSendMessage(input);
     setInput('');
-    setAttachments([]);
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#131313] border-r border-gray-800">
+    <div className="flex flex-col h-full bg-gray-900 border-r border-gray-800">
       {/* Chat History */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 opacity-60">
-            <p className="text-sm">Bắt đầu bằng cách mô tả ứng dụng của bạn hoặc đính kèm thiết kế.</p>
+          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 space-y-4">
+            <div className="p-4 bg-gray-800 rounded-full bg-opacity-50">
+                <Sparkles size={32} className="text-purple-400" />
+            </div>
+            <div>
+                <h3 className="text-lg font-medium text-white mb-2">GenWeb AI</h3>
+                <p className="text-sm max-w-[250px]">
+                  Describe an app or website component to build it instantly.
+                  <br/><span className="text-xs opacity-60">Try: "Landing page for a coffee shop" or "Một trang đăng nhập hiện đại màu xanh"</span>
+                </p>
+            </div>
           </div>
         )}
         
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-              msg.role === 'model' ? 'bg-gradient-to-br from-blue-600 to-purple-600' : 'bg-gray-700'
+          <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {msg.role === 'model' && (
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <Bot size={16} className="text-white" />
+              </div>
+            )}
+            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+              msg.role === 'user' 
+                ? 'bg-blue-600 text-white rounded-br-none' 
+                : 'bg-gray-800 text-gray-100 rounded-bl-none border border-gray-700'
             }`}>
-              {msg.role === 'model' ? <Bot size={18} className="text-white" /> : <UserIcon size={18} className="text-gray-300" />}
+              {msg.content}
             </div>
-            
-            <div className={`max-w-[85%] space-y-2`}>
-              {msg.attachments && msg.attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2 justify-end">
-                   {msg.attachments.map((att, i) => (
-                     <img 
-                       key={i}
-                       src={`data:${att.mimeType};base64,${att.data}`} 
-                       alt="attachment" 
-                       className="h-32 rounded-lg border border-gray-700 object-cover"
-                     />
-                   ))}
-                </div>
-              )}
-              {msg.content && (
-                <div className={`rounded-lg p-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                  msg.role === 'user' 
-                    ? 'bg-[#2b2d31] text-gray-100 border border-gray-700' 
-                    : 'text-gray-300'
-                }`}>
-                  {msg.content}
-                </div>
-              )}
-            </div>
+            {msg.role === 'user' && (
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <UserIcon size={16} className="text-gray-300" />
+              </div>
+            )}
           </div>
         ))}
 
         {status.isGenerating && (
-           <div className="flex gap-4">
-             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center flex-shrink-0 animate-pulse">
-                <Bot size={18} className="text-white" />
+           <div className="flex gap-3 justify-start">
+             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 animate-pulse">
+                <Bot size={16} className="text-white" />
               </div>
-              <div className="text-gray-400 text-sm flex items-center gap-2 py-2">
-                <Loader2 size={14} className="animate-spin text-blue-400" />
-                <span>{status.step === 'thinking' ? 'Đang phân tích yêu cầu...' : 'Đang viết mã...'}</span>
+              <div className="bg-gray-800 text-gray-300 rounded-2xl rounded-bl-none px-4 py-3 text-sm border border-gray-700 flex items-center gap-2">
+                <Loader2 size={16} className="animate-spin text-blue-400" />
+                <span>{status.step === 'thinking' ? 'Designing...' : 'Coding component...'}</span>
               </div>
            </div>
         )}
@@ -114,71 +83,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-[#131313] border-t border-gray-800">
-        {attachments.length > 0 && (
-          <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
-            {attachments.map((att, i) => (
-              <div key={i} className="relative group">
-                <img 
-                  src={`data:${att.mimeType};base64,${att.data}`} 
-                  alt="preview" 
-                  className="h-16 w-16 object-cover rounded-md border border-gray-700"
-                />
-                <button 
-                  onClick={() => removeAttachment(i)}
-                  className="absolute -top-2 -right-2 bg-gray-800 rounded-full p-1 border border-gray-600 text-gray-400 hover:text-red-400"
-                >
-                  <X size={10} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="relative bg-[#1e1e1e] rounded-xl border border-gray-700 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-transparent transition-all">
-          <textarea
+      <div className="p-4 bg-gray-900 border-t border-gray-800">
+        <form onSubmit={handleSubmit} className="relative">
+          <input
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            placeholder="Mô tả ứng dụng của bạn hoặc yêu cầu thay đổi..."
-            className="w-full bg-transparent text-white placeholder-gray-500 text-sm p-3 max-h-32 min-h-[50px] focus:outline-none resize-none"
-            rows={1}
+            placeholder="Describe your app..."
+            className="w-full bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-xl py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             disabled={status.isGenerating}
           />
-          <div className="flex items-center justify-between px-2 pb-2">
-             <button
-               type="button"
-               onClick={() => fileInputRef.current?.click()}
-               className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700 transition-colors"
-               title="Đính kèm ảnh"
-             >
-               <ImageIcon size={18} />
-             </button>
-             <input 
-               type="file" 
-               ref={fileInputRef} 
-               className="hidden" 
-               accept="image/*"
-               onChange={handleFileSelect}
-             />
-
-             <button
-              type="submit"
-              disabled={(!input.trim() && attachments.length === 0) || status.isGenerating}
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {status.isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || status.isGenerating}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {status.isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+          </button>
         </form>
-        <p className="text-[10px] text-gray-500 mt-2 text-center">
-          GenWeb AI Studio • Gemini 2.5 Flash / 3.0 Pro
-        </p>
       </div>
     </div>
   );

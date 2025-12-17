@@ -1,5 +1,5 @@
 {
   "name": "GenWeb AI Builder",
-  "description": "Ứng dụng tạo web bằng AI. Mô tả ý tưởng website hoặc ứng dụng của bạn bằng tiếng Việt, và xem nó được xây dựng ngay lập tức.",
+  "description": "An AI-powered application generator. Describe your website or app idea in Vietnamese or English, and watch it be built and rendered instantly.",
   "requestFramePermissions": []
 }
