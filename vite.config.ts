@@ -7,6 +7,6 @@ export default defineConfig({
   base: './', // Quan trọng: Đặt đường dẫn tương đối để chạy được trên GitHub Pages
   define: {
     // Polyfill process.env.API_KEY for the GenAI SDK
-    'process.env.API_KEY': JSON.stringify("AIzaSyA57jfHFi4d1IHU5FniT2u69Bnur8wyiC8")
+    'process.env.API_KEY': JSON.stringify("")
   }
 });
